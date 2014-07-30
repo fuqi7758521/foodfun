@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.foodfun.common.dao.ChargeDAO">
+    <insert id="addChargeLog" parameterType="ChargeLogTO">
+        insert into charge_log(user_id, money, charged_date)
+        values
+        (#{userId}, #{money}, now())
+    </insert>
+    
+	<update id="updateChargeLog" parameterType="ChargeLogTO">
+	    update charge_log set status = #{status}, confirmed_date = now()
+	    where id = #{id}
+	</update>
+    
+    <select id="getChargeLogs" resultType="ChargeLogTO" parameterType="ChargeLogCriteriaTO">
+        select L.id, L.money, L.charged_date chargedDate, L.confirmed_date confirmedDate, 
+        L.status, L.user_id userId, U.realname userRealname
+        from charge_log L
+        join user U
+        on L.user_id = U.ID
+        where 1=1
+        <if test="userId != null"> and L.user_id=#{userId}</if>
+        <if test="chargedStartDate != null"> and L.charged_date  &gt;= #{chargedStartDate}</if>
+        <if test="chargedEndDate != null"> and L.charged_date  &lt;= #{chargedEndDate}</if>
+        <if test="status != null"> and L.status = #{status}</if>
+	    order by L.charged_date desc
+        <if test="pageModel != null and pageModel.pageSize != 0">
+		     limit #{pageModel.offset}, #{pageModel.pageSize}
+	    </if>
+    </select>
+    
+    <select id="getChargeLogsCnt" resultType="int" parameterType="ChargeLogCriteriaTO">
+        select count(*)
+        from charge_log L
+        join user U
+        on L.user_id = U.ID
+        where 1=1
+        <if test="userId != null"> and L.user_id=#{userId}</if>
+        <if test="chargedStartDate != null"> and L.charged_date  &gt;= #{chargedStartDate}</if>
+        <if test="chargedEndDate != null"> and L.charged_date  &lt;= #{chargedEndDate}</if>
+        <if test="status != null"> and L.status = #{status}</if>
+    </select>
+    
+    <select id="getChargeById" parameterType="long" resultType="ChargeLogTO">
+        select id, user_id userId, money, charged_date chargedDate, confirmed_date confirmedDate, status from charge_log
+        where id = #{id}
+    </select>
+</mapper>

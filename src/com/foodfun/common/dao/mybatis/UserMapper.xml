@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.foodfun.common.dao.UserDAO">
+    
+    <insert id="add" parameterType="UserTO">
+        insert into user (username, realname, email, password, registered_date)
+        values
+        (#{username}, #{realname}, #{email}, #{password}, now())
+    </insert>
+    
+    <update id="update" parameterType="UserTO">
+        update user set id=id
+        <if test="username != null">, username=#{username}</if>
+        <if test="realname != null">, realname=#{realname}</if>
+        <if test="email != null">, email=#{email}</if>
+        <if test="status != null">, status=#{status}</if>
+        <if test="password != null">, password=#{password}</if>
+        <if test="balance != null">, balance=#{balance}</if>
+        <if test="isAdmin != null">, is_admin=#{isAdmin}</if>
+        <if test="lastLoginedDate != null">, last_logined_date=#{lastLoginedDate}</if>
+        where id=#{id}
+    </update>
+    
+    <select id="getUser" parameterType="UserTO" resultType="UserTO">
+        select id, username, realname, email, balance, status, password, registered_date  registeredDate, last_logined_date lastLoginedDate,is_admin isAdmin  from user
+        where 1=1
+        <if test="username != null"> and username=#{username}</if>
+        <if test="password != null"> and password=#{password}</if>
+        <if test="id != null"> and id=#{id}</if>
+    </select>
+    
+    <select id="getUsers" resultType="UserTO" parameterType="UserCriteriaTO">
+        select id, username, realname, email, password,
+        balance, status, registered_date registeredDate, is_admin isAdmin from user
+        where 1=1
+        <if test="status != null"> and status=#{status}</if>
+        <if test="username != null"> and username=#{username}</if>
+        <if test="realname != null"> and realname=#{realname}</if>
+        <if test="registeredStartDate != null"> and registered_date &gt;= #{registeredStartDate}</if>
+        <if test="registeredEndDate != null"> and registered_date &lt; #{registeredEndDate}</if>
+        order by registered_date desc 
+         <if test="pageModel != null and pageModel.pageSize != 0">
+		     limit #{pageModel.offset}, #{pageModel.pageSize}
+	    </if>   
+    </select>
+    
+    <select id="getUsersCnt" resultType="int" parameterType="UserCriteriaTO">
+        select count(*) from user
+        where 1=1
+        <if test="status != null"> and status=#{status}</if>
+        <if test="username != null"> and username=#{username}</if>
+        <if test="realname != null"> and realname=#{realname}</if>
+        <if test="registeredStartDate != null"> and registered_date &gt;= #{registeredStartDate}</if>
+        <if test="registeredEndDate != null"> and registered_date &lt; #{registeredEndDate}</if>
+    </select>
+    
+    
+</mapper>

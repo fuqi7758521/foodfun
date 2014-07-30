@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"classpath:org/apache/ibatis/builder/xml/mybatis-3-config.dtd">
+<configuration>
+    
+    <settings>
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="aggressiveLazyLoading" value="true"/>
+    </settings>
+    
+	<typeAliases>
+  		<typeAlias alias="UserTO" type="com.foodfun.common.to.UserTO"/>
+  		<typeAlias alias="MerchantTO" type="com.foodfun.common.to.MerchantTO"/>
+  		<typeAlias alias="ChargeLogTO" type="com.foodfun.common.to.ChargeLogTO"/>
+  		<typeAlias alias="OrderDetailTO" type="com.foodfun.common.to.OrderDetailTO"/>
+  		<typeAlias alias="OrderOverallTO" type="com.foodfun.common.to.OrderOverallTO"/>
+  		<typeAlias alias="MenuTO" type="com.foodfun.common.to.MenuTO"/>
+  		
+  		
+  		<typeAlias alias="UserCriteriaTO" type="com.foodfun.common.criteria.UserCriteriaTO"/>
+  		<typeAlias alias="MerchantCriteriaTO" type="com.foodfun.common.criteria.MerchantCriteriaTO"/>
+  		<typeAlias alias="ChargeLogCriteriaTO" type="com.foodfun.common.criteria.ChargeLogCriteriaTO"/>
+  		<typeAlias alias="OrderDetailCriteriaTO" type="com.foodfun.common.criteria.OrderDetailCriteriaTO"/>
+  		<typeAlias alias="OrderOverallCriteriaTO" type="com.foodfun.common.criteria.OrderOverallCriteriaTO"/>
+  		<typeAlias alias="MenuCriteriaTO" type="com.foodfun.common.criteria.MenuCriteriaTO"/>
+  		
+	</typeAliases>
+	
+</configuration>

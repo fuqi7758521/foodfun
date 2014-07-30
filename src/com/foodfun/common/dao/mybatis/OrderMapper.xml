@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.foodfun.common.dao.OrderDAO">
+
+    <select id="getOrderOverallList" resultType="OrderOverallTO" parameterType="OrderOverallCriteriaTO">
+        select oo.id, oo.user_id userId, u.realname userRealname, oo.money, oo.status, oo.created_date createdDate from order_overall oo
+        inner join user u on oo.user_id = u.id
+        where 1=1
+        <if test="userId != null and  userId != 0"> and oo.user_id=#{userId}</if>
+        <if test="startTime != null and startTime != ''"> and oo.created_date &gt;= #{startTime}</if>
+        <if test="endTime != null and endTime != ''"> and oo.created_date  &lt; #{endTime}</if>
+        <if test="status != null"> and oo.status = #{status}</if>
+        <if test="id != null"> and oo.id = #{id}</if>
+        order by oo.created_date desc
+        <if test="pageModel != null and pageModel.pageSize != 0">
+		     limit #{pageModel.offset}, #{pageModel.pageSize}
+	    </if>
+    </select>
+    
+    <select id="getOrderOverallsCnt" resultType="int" parameterType="OrderOverallCriteriaTO">
+        select count(*) from order_overall
+        where 1=1
+        <if test="userId != null and  userId != 0"> and user_id=#{userId}</if>
+        <if test="startTime != null and startTime != ''"> and created_date &gt;= #{startTime}</if>
+        <if test="endTime != null and endTime != ''"> and created_date  &lt; #{endTime}</if>
+        <if test="status != null"> and status = #{status}</if>
+        <if test="id != null"> and id = #{id}</if>
+    </select>
+    
+    <select id="getOrderDetails" resultType="OrderDetailTO" parameterType="OrderDetailCriteriaTO">
+        select od.id, od.order_id orderId, od.menu_id menuId, od.menu_name menuName, od.merchant_id merchantId, mc.name merchantName,
+        od.price, od.count, od.created_date createdDate, od.status 
+        from order_detail od inner join menu m on m.id = od.menu_id
+        inner join merchant mc on mc.id = m.merchant_id
+        where od.order_id = #{orderOverallId}
+    </select>
+    
+    <select id="getOrderDetailsCnt" resultType="int" parameterType="OrderDetailCriteriaTO">
+        select count(*) 
+        from order_detail od
+        where od.order_id = #{orderOverallId}
+    </select>
+    
+    <select id="getTodayOrderDetailOverview" parameterType="OrderDetailCriteriaTO" resultType="OrderDetailTO">
+        select MC.id merchantId, MC.name merchantName, M.id menuId, M.name menuName, D.price , sum(count) count from order_detail D
+        inner join menu M on D.menu_id = M.id
+        inner join merchant MC on M.merchant_id = MC.id
+        where D.status = 1 and 
+        D.created_date &gt;= #{startOrderDateStr} and D.created_date &lt;= #{endOrderDateStr}
+        group by MC.id, M.id
+    </select>
+    
+    <delete id="updateOrderOverall" parameterType="OrderOverallTO">
+        update order_overall set id=id
+        <if test="status != null">, status = #{status}</if>
+        where id = #{id}
+    </delete>
+    
+    <delete id="updateOrderDetail" parameterType="OrderDetailTO">
+        update order_detail set id=id
+        <if test="status != null">, status = #{status}</if>
+        where order_id = #{orderOverallId}
+    </delete>
+    
+    <insert id="addOrderOverall" parameterType="OrderOverallTO" useGeneratedKeys="true" keyProperty="id">
+        insert into order_overall(user_id, money, created_date)
+        values
+        (#{userId}, #{money}, now())
+    </insert>
+    
+    <insert id="addOrderDetail" parameterType="OrderDetailTO">
+        insert into order_detail(order_id, menu_id, menu_name, price, count, created_date)
+        values
+        (#{orderOverallId}, #{menuId}, #{menuName}, #{price}, #{count}, now())
+    </insert>
+    
+    <select id="getOrderOverallTOById" parameterType="long" resultType="OrderOverallTO">
+        select id, user_id userId, money, status, created_date createdDate from order_overall
+        where id = #{id}
+    </select>
+
+
+</mapper>

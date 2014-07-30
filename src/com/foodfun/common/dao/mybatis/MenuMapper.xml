@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.foodfun.common.dao.MenuDAO">
+    
+    <insert id="add" parameterType="MenuTO" useGeneratedKeys="true" keyProperty="id">
+        insert into menu(name, price, imgUrl, merchant_id, created_date)
+        values
+        (#{name}, #{price}, #{imgUrl}, #{merchantId}, now())
+    </insert>
+    
+    <insert id="addMenuDynamic" parameterType="long" >
+        insert into menu_dynamic(menu_id, count_of_comment, count_of_order)
+        values
+        (#{menuId}, 0, 0)
+    </insert>
+    
+    <update id="update" parameterType="MenuTO">
+        update menu set id=id
+        <if test="status != null"> , status = #{status}</if>
+        <if test="price != null"> , price = #{price}</if>
+        <if test="name != null"> , name = #{name}</if>
+        <if test="imgUrl != null"> , imgUrl = #{imgUrl}</if>
+        <if test="merchantId != null"> , merchant_id = #{merchantId}</if>
+        where id = #{id}
+    </update>
+    
+    <update id="updateMenuDynamic" parameterType="map">
+        update menu_dynamic set id=id
+        <if test="addCommentCount != null">, count_of_comment = count_of_comment + 1</if>
+        <if test="addOrderCount != null">, count_of_order = count_of_order + 1</if>
+        where menu_id = #{menuId}
+    </update>
+    
+    <select id="getMenus" resultType="MenuTO" parameterType="MenuCriteriaTO">
+        select menu.id, menu.name, menu.price, menu.imgUrl, menu.status, menu.created_date createdDate,
+        menu.merchant_id merchantId,  merchant.name merchantName 
+        from menu
+        left join menu_dynamic on menu.id=menu_dynamic.menu_id
+        left join merchant on merchant.id=menu.merchant_id
+        where 1=1
+        <if test="id != null"> and menu.id=#{id}</if>
+        <if test="status != null"> and menu.status=#{status}</if>
+        <if test="merchantId != null"> and menu.merchant_id = #{merchantId}</if>
+        <if test="orderType != null and orderType == 1"> order by menu_dynamic.count_of_order desc</if>
+        <if test="orderType != null and orderType == 2"> order by menu.price asc</if>
+        <if test="orderType != null and orderType == 3"> order by menu.created_date desc</if>
+        <if test="pageModel != null and pageModel.pageSize != 0">
+		     limit #{pageModel.offset}, #{pageModel.pageSize}
+	    </if>
+    </select>
+    
+    <select id="getMenusCnt" resultType="int" parameterType="MenuCriteriaTO">
+        select count(*) 
+        from menu
+        left join menu_dynamic on menu.id=menu_dynamic.menu_id
+        left join merchant on merchant.id=menu.merchant_id
+        where 1=1
+        <if test="id != null"> and menu.id=#{id}</if>
+        <if test="status != null"> and menu.status=#{status}</if>
+        <if test="merchantId != null"> and menu.merchant_id = #{merchantId}</if>
+    </select>
+    
+    <select id="getMenuById" parameterType="long" resultType="MenuTO">
+        select id, name, price, imgUrl, status, merchant_id merchantId from menu
+        where id = #{id}
+    </select>
+    
+    
+</mapper>

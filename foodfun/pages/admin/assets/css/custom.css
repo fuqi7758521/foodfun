@@ -1,0 +1,4 @@
+/* here you can put your own css to customize and override the theme */
+/* 表格行变色 */
+.row_selected{background-color:#DFF0D8;}
+.row_hover{background-color:#D0E9C6;}
